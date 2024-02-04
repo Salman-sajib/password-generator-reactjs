@@ -1,10 +1,13 @@
-import { useCallback, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 function App() {
   const [length, setLength] = useState(8);
   const [numberAllowed, setNumberAllowed] = useState(false);
   const [charAllowed, setCharAllowed] = useState(false);
   const [password, setPassword] = useState('');
+
+  const passwordRef = useRef(null);
 
   const generatePassword = useCallback(() => {
     let pass = '';
@@ -21,21 +24,34 @@ function App() {
     setPassword(pass);
   }, [length, numberAllowed, charAllowed]);
 
+  const copyPasswordToClipboard = () => {
+    window.navigator.clipboard.writeText(password);
+    passwordRef.current?.select();
+  };
+
+  useEffect(() => {
+    generatePassword();
+  }, [length, numberAllowed, charAllowed]);
+
   return (
-    <div className=' w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 bg-gray-800 text-orange-500'>
+    <div className='w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 bg-gray-800 text-orange-500'>
       <h1 className='text-3xl font-bold mb-2 text-center'>
         Password Generator
       </h1>
 
-      <div className='flex shadow rounded-lg overflow-hidden mb-4'>
+      <div className='flex shadow rounded-lg overflow-hidden my-4'>
         <input
           type='text'
           value={password}
           placeholder='Password'
           className='outline-none w-full py-1 px-3'
           readOnly
+          ref={passwordRef}
         />
-        <button className='outline-none bg-blue-700 text-white px-3'>
+        <button
+          onClick={copyPasswordToClipboard}
+          className='outline-none bg-blue-700 text-white px-3'
+        >
           copy
         </button>
       </div>
